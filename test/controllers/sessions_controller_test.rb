@@ -4,7 +4,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
   test "new renders login form" do
     get login_path
     assert_response :success
-    assert_select "h1", "Pleasant Conversation"
+    assert_select "h1", "Pleasant Interactions"
   end
 
   test "login with valid credentials succeeds" do

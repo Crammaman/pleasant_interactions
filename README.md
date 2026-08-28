@@ -1,4 +1,4 @@
-# Pleasant Conversation
+# Pleasant Interactions
 
 A small Rails app for managing conversation queues. Users can have a Profile
 with configurable Questions (text, select, or radio); each profile has a

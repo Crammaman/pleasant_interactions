@@ -1,7 +1,7 @@
 # fly.toml — https://fly.io/docs/reference/configuration/
 #
 # Deploy:
-#   fly launch --no-deploy --copy-config   # or: fly apps create pleasant-conversation
+#   fly launch --no-deploy --copy-config   # or: fly apps create pleasant-interactions
 #   fly secrets set RAILS_MASTER_KEY="$(cat config/master.key)"
 #   fly volumes create sqlite_data --size 1 --region iad
 #   fly deploy
@@ -10,7 +10,7 @@
 # exactly ONE machine — two machines would each get their own volume and their
 # own divergent database.
 
-app = "pleasant-conversation"
+app = "pleasant-interactions"
 primary_region = "syd"
 
 [build]

@@ -2,8 +2,8 @@
 # check=error=true
 
 # This Dockerfile is designed for production, not development. Use with Kamal or build'n'run by hand:
-# docker build -t pleasant_conversation .
-# docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value from config/master.key> --name pleasant_conversation pleasant_conversation
+# docker build -t pleasant_interactions .
+# docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value from config/master.key> --name pleasant_interactions pleasant_interactions
 
 # For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
 
