@@ -1,0 +1,232 @@
+/*
+ * Brand theme for Bulma 1.0.4.
+ *
+ * Bulma 1.x builds every shade, hover state and invert from a handful of
+ * h/s/l triples, so overriding those triples recolours the whole framework
+ * consistently. Bulma itself is untouched — it comes from the bulma-rails gem.
+ *
+ * Palette
+ *   #6922e4  violet   hsl(262, 78.2%, 51.4%)   primary; navbar, buttons, anchors
+ *   #da70d6  orchid   hsl(302.3, 58.9%, 64.7%) link — an is-link button FILL
+ *   #342048  indigo   hsl(270, 38.5%, 20.4%)   is-dark, headings, dark-scheme cards
+ *   #c4c3d0  mist     hsl(244.6, 12.1%, 79%)   light-scheme page, dark-scheme text
+ *   #2c2c2b  soot     hsl(60, 1.1%, 17.1%)     light-scheme text, dark-scheme page
+ *
+ * #c4c3d0 and #2c2c2b are reciprocals (8:1 either way), so they swap roles
+ * between the two schemes: page in one is body text in the other.
+ *
+ * Load order: application.scss @uses this last, after bulma and _switch, so
+ * these overrides win the cascade. Keep it last if you add layers.
+ */
+
+:root {
+  /* ---- Brand colours (shared by both schemes) ---- */
+
+  /* #6922e4 */
+  --bulma-primary-h: 262deg;
+  --bulma-primary-s: 78.2%;
+  --bulma-primary-l: 51.4%;
+  /* Bulma's stock primary is light enough to take dark text; this violet is
+     not (dark-on-violet is 2.8:1). Force white: 7.1:1. */
+  --bulma-primary-invert-l: 100%;
+
+  /* #da70d6 — carried as `link` so `.button.is-link` is an orchid fill.
+     Orchid only reaches 2.9:1 on white, so it is never used as body text:
+     --bulma-link-text below points anchors at the violet instead. */
+  --bulma-link-h: 302.3deg;
+  --bulma-link-s: 58.9%;
+  --bulma-link-l: 64.7%;
+  /* Anything sitting on an orchid fill (pagination current, active tab, an
+     is-link table cell) goes dark rather than Bulma's default white, which
+     would be 2.9:1. See .button.is-link at the foot of this file. */
+  --bulma-link-invert: #2c2c2b;
+  --bulma-link-invert-l: 17.1%;
+
+  /* #342048 */
+  --bulma-dark-h: 270deg;
+  --bulma-dark-s: 38.5%;
+  --bulma-dark-l: 20.4%;
+  --bulma-dark-invert-l: 100%;
+
+  /* `is-light` sits pale so it stays visible on the #c4c3d0 page. */
+  --bulma-light-h: 244.6deg;
+  --bulma-light-s: 12.1%;
+  --bulma-light-l: 94%;
+  --bulma-light-invert: #2c2c2b;
+
+  /* Focus rings follow the primary too. Bulma points --bulma-focus-* at the
+     link colour, and an orchid ring is only 2.9:1 on a white input — under the
+     3:1 a focus indicator needs. -on-scheme-l keeps it readable in both
+     schemes: 8.6:1 on a white card, 5.1:1 on a dark one. */
+  --bulma-focus-h: var(--bulma-primary-h);
+  --bulma-focus-s: var(--bulma-primary-s);
+  --bulma-focus-l: var(--bulma-primary-on-scheme-l);
+
+  /* Anchors track the primary, not the link colour. Hover/active reuse Bulma's
+     own deltas so they stay consistent with the rest of the framework. */
+  --bulma-link-text: hsl(var(--bulma-primary-h), var(--bulma-primary-s), var(--brand-anchor-l));
+  --bulma-link-text-hover: hsl(var(--bulma-primary-h), var(--bulma-primary-s), calc(var(--brand-anchor-l) + var(--bulma-hover-color-l-delta)));
+  --bulma-link-text-active: hsl(var(--bulma-primary-h), var(--bulma-primary-s), calc(var(--brand-anchor-l) + var(--bulma-active-color-l-delta)));
+
+  /* ---- Light scheme ---- */
+
+  /* Neutral ramp drawn from #c4c3d0's hue; the mist itself is the page, and
+     cards stay white so they lift off it. */
+  --bulma-scheme-h: 244.6deg;
+  --bulma-scheme-s: 12.1%;
+  --bulma-scheme-main-l: 100%;   /* cards, boxes, inputs */
+  --bulma-body-background-color: #c4c3d0;
+
+  /* #2c2c2b body copy. */
+  --bulma-text-h: 60deg;
+  --bulma-text-s: 1.1%;
+  --bulma-text-l: 17.1%;
+  --bulma-text-strong-l: 11%;
+  --bulma-text-weak-l: 42%;
+
+  /* The brand violet only reaches 4.1:1 on the #c4c3d0 page, so anchor text is
+     a shade deeper: 4.9:1 on the page, 8.6:1 on a white card. Buttons and the
+     navbar keep #6922e4 exactly. */
+  --brand-anchor-l: 45%;
+  --bulma-primary-on-scheme-l: 45%;
+  --bulma-link-on-scheme-l: 35%;
+
+  /* Headings in indigo; applied to .title below. */
+  --brand-title-color: hsl(270deg, 38.5%, 20.4%);
+
+  /* In-progress card tint; 91% matches Bulma's own --bulma-primary-90-l, so
+     the light scheme is unchanged. See .has-background-primary-light below. */
+  --brand-progress-tint-l: 91%;
+
+  /* Unchecked switch track on an ordinary background. See .switch below. */
+  --brand-switch-off: hsl(244.6deg, 12.1%, 62%);
+}
+
+/* ---- Dark scheme ----
+   Same declarations twice: once for the OS preference (skipped when a theme is
+   explicitly forced light) and once for Bulma's explicit dark selectors. */
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.theme-light):not([data-theme=light]) {
+    /* Cards are #342048 lifted off a #2c2c2b page. */
+    --bulma-scheme-h: 270deg;
+    --bulma-scheme-s: 38.5%;
+    --bulma-scheme-main-l: 20.4%;
+    --bulma-scheme-main-bis-l: 23%;
+    --bulma-scheme-main-ter-l: 26%;
+    --bulma-background-l: 26%;
+    --bulma-border-weak-l: 27%;
+    --bulma-border-l: 32%;
+    --bulma-body-background-color: #2c2c2b;
+
+    /* #c4c3d0 body copy: 8.3:1 on the card, 8.0:1 on the page. */
+    --bulma-text-h: 244.6deg;
+    --bulma-text-s: 12.1%;
+    --bulma-text-l: 79%;
+    --bulma-text-strong-l: 92%;
+    --bulma-text-weak-l: 60%;
+
+    /* The 51% violet is only 2.0:1 on #2c2c2b; lift it for text use. */
+    --brand-anchor-l: 73%;
+    --bulma-primary-on-scheme-l: 73%;
+    --bulma-link-on-scheme-l: 70%;
+
+    /* Indigo would vanish against its own card. */
+    --brand-title-color: var(--bulma-text-strong);
+    --brand-progress-tint-l: 24%;
+    --brand-switch-off: hsl(270deg, 38.5%, 40%);
+
+  }
+}
+
+.theme-dark,
+[data-theme=dark] {
+  --bulma-scheme-h: 270deg;
+  --bulma-scheme-s: 38.5%;
+  --bulma-scheme-main-l: 20.4%;
+  --bulma-scheme-main-bis-l: 23%;
+  --bulma-scheme-main-ter-l: 26%;
+  --bulma-background-l: 26%;
+  --bulma-border-weak-l: 27%;
+  --bulma-border-l: 32%;
+  --bulma-body-background-color: #2c2c2b;
+
+  --bulma-text-h: 244.6deg;
+  --bulma-text-s: 12.1%;
+  --bulma-text-l: 79%;
+  --bulma-text-strong-l: 92%;
+  --bulma-text-weak-l: 60%;
+
+  --brand-anchor-l: 73%;
+  --bulma-primary-on-scheme-l: 73%;
+  --bulma-link-on-scheme-l: 70%;
+
+  --brand-title-color: var(--bulma-text-strong);
+  --brand-progress-tint-l: 24%;
+  --brand-switch-off: hsl(270deg, 38.5%, 40%);
+}
+
+/* Bulma declares --bulma-title-color on `.subtitle,.title` itself, so a :root
+   value is shadowed and headings must be targeted directly. Keeping this rule
+   at a single class of specificity leaves `.hero.is-* .title` (0,3,0) intact. */
+.title {
+  --bulma-title-color: var(--brand-title-color);
+  --bulma-title-strong-color: var(--brand-title-color);
+}
+
+/* .button composes its label as hsl(button-h, button-s, button-color-l), so the
+   hue is locked to the link's orchid and no variable can yield a neutral label
+   — only a plum. Set the colour outright to get #2c2c2b (4.8:1 on the fill).
+   This is (0,2,0), so .is-inverted / .is-outlined variants (0,3,0) still win
+   and keep their own colours. */
+.button.is-link {
+  color: #2c2c2b;
+}
+
+/* `has-background-primary-light` (the in-progress conversation card) is a
+   background-only utility, and Bulma holds --bulma-primary-light-l at 91% for
+   both schemes. In the dark scheme that left a pale lavender card carrying the
+   scheme's light text. --brand-progress-tint-l darkens it there, letting the
+   card's own colours work: body copy 8.6:1, the is-ghost footer button 5.2:1,
+   the grey-light placeholder 6.7:1. queue.css fades to the same variable.
+
+   Driven by a variable rather than by moving --bulma-primary-light-l, because
+   `.tag.is-primary.is-light` takes its background from --bulma-light-l but its
+   text from --bulma-primary-light-invert-l -- shifting those turns that tag
+   pale-on-pale. !important matches Bulma's own utility rule. */
+.has-background-primary-light {
+  background-color: hsl(var(--bulma-primary-h), var(--bulma-primary-s), var(--brand-progress-tint-l)) !important;
+}
+
+/* Bulma 1.0.4 bakes the grey utilities as literal hexes
+   (`.has-text-grey-light{color:#abb1bf!important}`) and never reads
+   --bulma-grey-*, so the palette has to be applied to the classes themselves.
+   Both are muted text used inside cards; these lightnesses clear 4.5:1 on
+   every surface in either scheme, including the bare page. */
+.has-text-grey {
+  color: hsl(244.6deg, 12.1%, 30%) !important;
+}
+
+.has-text-grey-light {
+  color: hsl(244.6deg, 12.1%, 35%) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.theme-light):not([data-theme=light]) .has-text-grey {
+    color: hsl(244.6deg, 12.1%, 71%) !important;
+  }
+
+  :root:not(.theme-light):not([data-theme=light]) .has-text-grey-light {
+    color: hsl(244.6deg, 12.1%, 64%) !important;
+  }
+}
+
+.theme-dark .has-text-grey,
+[data-theme=dark] .has-text-grey {
+  color: hsl(244.6deg, 12.1%, 71%) !important;
+}
+
+.theme-dark .has-text-grey-light,
+[data-theme=dark] .has-text-grey-light {
+  color: hsl(244.6deg, 12.1%, 64%) !important;
+}

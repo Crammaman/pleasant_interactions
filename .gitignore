@@ -36,3 +36,6 @@
 # Ignore JetBrains IDE project files (RubyMine).
 /.idea/
 
+
+/app/assets/builds/*
+!/app/assets/builds/.keep

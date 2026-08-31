@@ -1,0 +1,39 @@
+/* Conversation card content is collapsed by default and expands on click. */
+.conversation-content {
+  position: relative;
+  max-height: 4.5rem;
+  min-height: 3rem;
+  overflow: hidden;
+  cursor: pointer;
+  transition: max-height 0.2s ease;
+}
+
+.conversation-content.is-expanded {
+  max-height: none;
+}
+
+/* Fade the bottom edge while collapsed to hint at hidden content. The fade
+   tracks the card's own background so it works in either colour scheme. */
+.conversation-content:not(.is-expanded)::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1.5rem;
+  background: linear-gradient(
+    to bottom,
+    hsla(var(--bulma-scheme-h), var(--bulma-scheme-s), var(--bulma-scheme-main-l), 0),
+    hsla(var(--bulma-scheme-h), var(--bulma-scheme-s), var(--bulma-scheme-main-l), 0.95)
+  );
+  pointer-events: none;
+}
+
+/* In-progress cards use has-background-primary-light, so fade to that instead. */
+.has-background-primary-light .conversation-content:not(.is-expanded)::after {
+  background: linear-gradient(
+    to bottom,
+    hsla(var(--bulma-primary-h), var(--bulma-primary-s), var(--brand-progress-tint-l), 0),
+    hsla(var(--bulma-primary-h), var(--bulma-primary-s), var(--brand-progress-tint-l), 0.95)
+  );
+}

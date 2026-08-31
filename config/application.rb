@@ -38,5 +38,19 @@ module PleasantInteractions
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+
+    # Sass is a compiler input, not a servable asset. Without this, Propshaft
+    # publishes our .scss sources and the whole of Bulma's Sass tree (~75 files)
+    # into public/assets, alongside the CSS dart-sass built from them.
+    #
+    # Propshaft subtracts excluded_paths from config.assets.paths, and that is
+    # the same list dartsass-rails derives Sass's --load-path from, so Bulma's
+    # directory has to be handed to the compiler explicitly. Our own stylesheet
+    # directory needs no such treatment: dartsass-rails always looks there.
+    bulma_sass_path = Gem.loaded_specs["bulma-rails"].gem_dir + "/app/assets/stylesheets"
+
+    config.assets.excluded_paths << Rails.root.join("app/assets/stylesheets")
+    config.assets.excluded_paths << bulma_sass_path
+    config.dartsass.build_options += [ "--load-path", bulma_sass_path ]
   end
 end

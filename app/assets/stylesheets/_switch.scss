@@ -1,0 +1,108 @@
+// Colour-scheme switch.
+//
+// Replaces the bulma-switch-control extension. That package shipped 13.6KB in
+// which only ~8% of the declarations could match this markup — the rest being
+// colour variants, sizes and modifiers we never use — and its palette was
+// Bulma 0.9's, so every colour had to be overridden anyway. Bulma 1.x has no
+// switch of its own. The geometry below reproduces what the extension rendered.
+
+.switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+
+  // Hidden rather than removed: it stays focusable, keeps the checkbox role
+  // and its checked state, and the wrapping label keeps it clickable.
+  input[type="checkbox"] {
+    position: absolute;
+    left: 0;
+    z-index: -1;
+    opacity: 0;
+  }
+
+  &-track {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    width: 2.75em;
+    height: 1.575em;
+    padding: 0.2em;
+    border-radius: 4px;
+    background: var(--brand-switch-off);
+    transition: background 150ms ease-out;
+
+    // The knob.
+    &::before {
+      content: "";
+      display: block;
+      width: 1.175em;
+      height: 1.175em;
+      border-radius: 4px;
+      background: hsl(0, 0%, 100%);
+      transition: transform 150ms ease-out;
+    }
+  }
+
+  &-label {
+    padding-left: 0.5em;
+  }
+
+  &:hover &-track {
+    filter: brightness(0.92);
+  }
+
+  input[type="checkbox"]:checked + &-track {
+    background: var(--bulma-primary);
+
+    &::before {
+      transform: translate3d(100%, 0, 0);
+    }
+  }
+
+  // The input is invisible, so the ring has to go on the track.
+  input[type="checkbox"]:focus-visible + &-track {
+    outline: var(--bulma-focus-width) var(--bulma-focus-style)
+      hsl(var(--bulma-focus-h), var(--bulma-focus-s), var(--bulma-focus-l));
+    outline-offset: var(--bulma-focus-offset);
+  }
+}
+
+// In the navbar the switch sits on the violet in both schemes, so it needs its
+// own colours: a darkened track when off, and a white track with a violet knob
+// when on. Written with explicit class names rather than `&-track`: `&` here
+// expands to the whole `.navbar .switch`, so nesting it again would compile to
+// a selector requiring a second .navbar inside the switch.
+.navbar .switch {
+  .switch-track {
+    background: hsla(0, 0%, 0%, 0.32);
+  }
+
+  &:hover .switch-track {
+    filter: none;
+    background: hsla(0, 0%, 0%, 0.45);
+  }
+
+  input[type="checkbox"]:checked + .switch-track {
+    background: hsl(0, 0%, 100%);
+
+    &::before {
+      background: var(--bulma-primary);
+    }
+  }
+
+  &:hover input[type="checkbox"]:checked + .switch-track {
+    background: hsla(0, 0%, 100%, 0.85);
+  }
+
+  input[type="checkbox"]:focus-visible + .switch-track {
+    outline-color: hsl(0, 0%, 100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .switch-track,
+  .switch-track::before {
+    transition: none;
+  }
+}

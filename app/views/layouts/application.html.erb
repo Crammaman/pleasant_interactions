@@ -18,8 +18,23 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
-    <%= stylesheet_link_tag :app %>
+    <script>
+      // Apply a saved theme choice before first paint, otherwise the page
+      // renders in the OS scheme then flips.
+      (function () {
+        try {
+          var saved = localStorage.getItem("theme");
+          if (saved === "light" || saved === "dark") {
+            document.documentElement.setAttribute("data-theme", saved);
+          }
+        } catch (e) {
+          // falls back to the OS preference is fine.
+        }
+      })();
+    </script>
+
+    <%# One bundle, compiled from application.scss by dartsass-rails %>
+    <%= stylesheet_link_tag "application" %>
     <%= javascript_importmap_tags %>
   </head>
 
@@ -36,6 +51,15 @@
                 <%= link_to "Add User", new_user_path, class: "button is-light" %>
                 <%= button_to "Log out", logout_path, method: :delete, class: "button is-primary is-inverted is-outlined" %>
               </div>
+            </div>
+            <div class="navbar-item" data-controller="theme">
+              <label class="switch">
+                <input type="checkbox" role="switch"
+                       data-theme-target="checkbox"
+                       data-action="change->theme#toggle">
+                <span class="switch-track"></span>
+                <span class="switch-label">Dark mode</span>
+              </label>
             </div>
           </div>
         </div>

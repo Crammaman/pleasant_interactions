@@ -1,0 +1,13 @@
+// Compiled by dartsass-rails into app/assets/builds/application.css.
+//
+// Bulma comes from the bulma-rails gem (Sass source) rather than a copied
+// bulma.min.css, so the version is managed in the Gemfile and upgraded with
+// `bundle update bulma-rails`. Every asset path is on Sass's load path, which
+// is how "bulma" resolves to the gem.
+//
+// Order matters: _theme.scss overrides Bulma's custom properties and the
+// switch's colours, so it has to come last.
+@use "bulma";
+@use "queue";
+@use "switch";
+@use "theme";

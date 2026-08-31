@@ -1,4 +1,2 @@
 Drag drop queue
-Fix colours
 Live update
-Rename from conversation to interactions
