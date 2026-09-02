@@ -37,3 +37,39 @@
     hsla(var(--bulma-primary-h), var(--bulma-primary-s), var(--brand-progress-tint-l), 0.95)
   );
 }
+
+/* The whole header of a movable card is the drag handle. Suppress text
+   selection so dragging across the title does not highlight it instead. */
+.conversation-drag-header {
+  cursor: grab;
+  user-select: none;
+}
+
+.card.is-dragging .conversation-drag-header {
+  cursor: grabbing;
+}
+
+/* Grip glyph. Purely a cue that the header above it can be dragged; the
+   in-progress card has none, which doubles as the hint that it is pinned. */
+.conversation-handle {
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--bulma-text-weak);
+}
+
+.conversation-drag-header:hover .conversation-handle {
+  color: var(--bulma-text-strong);
+}
+
+/* The card left behind under the cursor while dragging. */
+.card.is-dragging {
+  cursor: grabbing;
+  box-shadow: 0 0.5rem 1rem hsla(var(--bulma-scheme-h), var(--bulma-scheme-s), 4%, 0.25);
+}
+
+/* The placeholder SortableJS slides through the list to show the drop target. */
+.card.is-drag-ghost {
+  opacity: 0.4;
+  outline: 2px dashed var(--bulma-primary);
+  outline-offset: -2px;
+}

@@ -19,8 +19,10 @@
 </div>
 
 <% if @conversations.any? %>
-  <%= render partial: "queues/conversation", collection: @conversations, as: :conversation,
-             locals: { queue_in_progress: @in_progress.present? } %>
+  <div data-controller="queue-sort" data-queue-sort-url-value="<%= reorder_queue_path(@queue) %>">
+    <%= render partial: "queues/conversation", collection: @conversations, as: :conversation,
+               locals: { queue_in_progress: @in_progress.present? } %>
+  </div>
 <% else %>
   <div class="notification is-info is-light">
     <p>No conversations in this queue yet.</p>

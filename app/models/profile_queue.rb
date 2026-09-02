@@ -10,7 +10,7 @@ class ProfileQueue < ApplicationRecord
   scope :current, -> { where(current: true) }
 
   def active_conversations
-    conversations.active.order(created_at: :desc)
+    conversations.active.ordered
   end
 
   def in_progress_conversation

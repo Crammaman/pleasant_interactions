@@ -1,2 +1,1 @@
-Drag drop queue
 Live update

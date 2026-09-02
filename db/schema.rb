@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_17_060203) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_02_000001) do
   create_table "answers", force: :cascade do |t|
     t.integer "conversation_id", null: false
     t.datetime "created_at", null: false
@@ -25,9 +25,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_17_060203) do
   create_table "conversations", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name", null: false
+    t.integer "position", default: 0, null: false
     t.integer "queue_id", null: false
     t.string "state", default: "pending", null: false
     t.datetime "updated_at", null: false
+    t.index ["queue_id", "position"], name: "index_conversations_on_queue_id_and_position"
     t.index ["queue_id"], name: "index_conversations_on_queue_id"
   end
 

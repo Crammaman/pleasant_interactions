@@ -13,6 +13,9 @@ Rails.application.routes.draw do
   end
 
   resources :queues, only: %i[show] do
+    # Persists a drag-and-drop reorder of the queue's conversations.
+    patch :reorder, on: :member
+
     resources :conversations, only: %i[new create]
   end
 

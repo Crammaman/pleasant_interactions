@@ -11,7 +11,19 @@ class Conversation < ApplicationRecord
 
   scope :active, -> { where(state: %w[pending in_progress]) }
 
+  scope :ordered, -> { order(:position, created_at: :desc, id: :desc) }
+
+  before_create :assign_position
+
   def startable?
     pending? && queue.conversations.in_progress.none?
+  end
+
+  private
+
+  def assign_position
+    return if position_changed?
+
+    self.position = (queue.conversations.minimum(:position) || 0) - 1
   end
 end

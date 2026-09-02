@@ -1,6 +1,13 @@
 <% in_progress = conversation.in_progress? %>
-<div class="card mb-4 <%= "has-background-primary-light" if in_progress %>">
-  <header class="card-header <%= "has-background-primary" if in_progress %>">
+<%# is-locked keeps the in-progress conversation pinned to the top of the queue %>
+<div class="card mb-4 <%= "has-background-primary-light is-locked" if in_progress %>"
+     id="<%= dom_id(conversation) %>"
+     data-conversation-id="<%= conversation.id %>">
+  <header class="card-header <%= in_progress ? "has-background-primary" : "conversation-drag-header" %>"
+          <%= tag.attributes(data: { queue_sort_handle: true }, title: "Drag to reorder") unless in_progress %>>
+    <% unless in_progress %>
+      <span class="card-header-icon conversation-handle" aria-hidden="true">⠿</span>
+    <% end %>
     <p class="card-header-title <%= "has-text-white" if in_progress %>">
       <%= conversation.name %>
     </p>

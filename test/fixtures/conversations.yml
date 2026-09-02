@@ -2,13 +2,16 @@ catch_up:
   queue: alice_queue
   state: pending
   name: Catch-up
+  position: 0
 
 weekly_chat:
   queue: alice_queue
   state: pending
   name: Weekly chat
+  position: 1
 
 bob_chat:
   queue: bob_queue
   state: pending
   name: Morning chat
+  position: 0

@@ -9,12 +9,37 @@ class QueuesController < ApplicationController
     @queue = ProfileQueue.includes(profile: :user).find(params[:id])
     @profile = @queue.profile
     @in_progress = @queue.in_progress_conversation
-    # Active = pending + in_progress (unfinished, non-deleted). Pin the in-progress
-    # conversation to the top, then pending conversations newest-first.
+    # Active = pending + in_progress (unfinished, non-deleted), in the manual
+    # drag-and-drop order, with the in-progress conversation pinned to the top.
     @conversations =
       @queue.conversations
             .active
+            .ordered
             .includes(:answers)
-            .sort_by { |c| [ c.in_progress? ? 0 : 1, -c.created_at.to_f ] }
+            .partition(&:in_progress?)
+            .flatten(1)
+  end
+
+  # Persists a drag-and-drop reorder. The client sends every active conversation
+  # id in its new top-to-bottom order; positions are renumbered from zero.
+  def reorder
+    queue = ProfileQueue.find(params[:id])
+    conversations = queue.conversations.active.where(id: reorder_ids).index_by(&:id)
+
+    Conversation.transaction do
+      reorder_ids.each_with_index do |id, index|
+        conversations[id]&.update_column(:position, index)
+      end
+    end
+
+    head :no_content
+  end
+
+  private
+
+  # Ids are looked up within this queue, so anything foreign or already
+  # finished/deleted is simply ignored.
+  def reorder_ids
+    @reorder_ids ||= Array(params[:conversation_ids]).map(&:to_i)
   end
 end
