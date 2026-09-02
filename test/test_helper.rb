@@ -1,6 +1,8 @@
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
+# Provides assert_turbo_stream_broadcasts and friends; not required by default.
+require "turbo/broadcastable/test_helper"
 
 module ActiveSupport
   class TestCase

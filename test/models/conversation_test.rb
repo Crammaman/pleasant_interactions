@@ -1,6 +1,9 @@
 require "test_helper"
 
 class ConversationTest < ActiveSupport::TestCase
+  include Turbo::Broadcastable::TestHelper
+  include ActiveJob::TestHelper
+
   setup do
     @queue = profile_queues(:alice_queue)
   end
@@ -29,5 +32,31 @@ class ConversationTest < ActiveSupport::TestCase
     @queue.conversations.create!(name: "Gone", state: "deleted", position: 1)
 
     assert_equal [ "Weekly chat", "Catch-up" ], @queue.active_conversations.map(&:name)
+  end
+
+  test "adding a conversation refreshes everyone watching the queue" do
+    assert_turbo_stream_broadcasts @queue, count: 1 do
+      perform_enqueued_jobs { @queue.conversations.create!(name: "Newest") }
+    end
+  end
+
+  test "starting a conversation refreshes everyone watching the queue" do
+    stream = capture_turbo_stream_broadcasts @queue do
+      perform_enqueued_jobs { conversations(:catch_up).in_progress! }
+    end
+
+    assert_equal [ "refresh" ], stream.map { |element| element["action"] }
+  end
+
+  test "removing a conversation refreshes everyone watching the queue" do
+    assert_turbo_stream_broadcasts @queue, count: 1 do
+      perform_enqueued_jobs { conversations(:catch_up).deleted! }
+    end
+  end
+
+  test "a conversation refreshes its own queue, not another one" do
+    assert_no_turbo_stream_broadcasts profile_queues(:bob_queue) do
+      perform_enqueued_jobs { conversations(:catch_up).finished! }
+    end
   end
 end

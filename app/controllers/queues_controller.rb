@@ -32,6 +32,8 @@ class QueuesController < ApplicationController
       end
     end
 
+    queue.broadcast_refresh_later
+
     head :no_content
   end
 

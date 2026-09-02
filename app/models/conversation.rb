@@ -15,6 +15,8 @@ class Conversation < ApplicationRecord
 
   before_create :assign_position
 
+  broadcasts_refreshes_to :queue
+
   def startable?
     pending? && queue.conversations.in_progress.none?
   end

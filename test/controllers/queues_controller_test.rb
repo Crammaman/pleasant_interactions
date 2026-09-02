@@ -1,6 +1,9 @@
 require "test_helper"
 
 class QueuesControllerTest < ActionDispatch::IntegrationTest
+  include Turbo::Broadcastable::TestHelper
+  include ActiveJob::TestHelper
+
   setup do
     post login_path, params: { username: "admin", password: "password123" }
     @queue = profile_queues(:alice_queue)
@@ -96,6 +99,26 @@ class QueuesControllerTest < ActionDispatch::IntegrationTest
     assert_response :no_content
     assert_equal 0, weekly.reload.position
     assert_equal 1, catch_up.reload.position
+  end
+
+  test "show subscribes to the queue's stream and asks for morphing refreshes" do
+    get queue_path(@queue)
+    assert_response :success
+    assert_select "turbo-cable-stream-source[signed-stream-name=?]", signed_stream_name(@queue)
+    assert_select "meta[name='turbo-refresh-method'][content='morph']", 1
+    assert_select "meta[name='turbo-refresh-scroll'][content='preserve']", 1
+  end
+
+  test "reorder refreshes everyone watching the queue" do
+    catch_up = conversations(:catch_up)
+    weekly = conversations(:weekly_chat)
+
+    assert_turbo_stream_broadcasts @queue, count: 1 do
+      perform_enqueued_jobs do
+        patch reorder_queue_path(@queue),
+              params: { conversation_ids: [ weekly.id, catch_up.id ] }, as: :json
+      end
+    end
   end
 
   test "reorder ignores ids from another queue" do

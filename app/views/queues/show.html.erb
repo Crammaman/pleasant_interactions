@@ -1,5 +1,12 @@
 <% content_for :title, "#{@profile.display_name} — Queue" %>
 
+<%# Live updates: anything that changes this queue broadcasts a page refresh
+    (see Conversation#broadcasts_refreshes_to and QueuesController#reorder), and
+    morphing applies it in place, so open cards, scroll position and an active
+    drag survive someone else's change. %>
+<% turbo_refreshes_with method: :morph, scroll: :preserve %>
+<%= turbo_stream_from @queue %>
+
 <div class="level">
   <div class="level-left">
     <div class="level-item">
@@ -19,7 +26,8 @@
 </div>
 
 <% if @conversations.any? %>
-  <div data-controller="queue-sort" data-queue-sort-url-value="<%= reorder_queue_path(@queue) %>">
+  <div id="queue-conversations"
+       data-controller="queue-sort" data-queue-sort-url-value="<%= reorder_queue_path(@queue) %>">
     <%= render partial: "queues/conversation", collection: @conversations, as: :conversation,
                locals: { queue_in_progress: @in_progress.present? } %>
   </div>
@@ -29,12 +37,3 @@
     <%= link_to "Add a conversation", new_queue_conversation_path(@queue), class: "button is-primary mt-3" %>
   </div>
 <% end %>
-
-<script>
-  // Toggle the expanded/collapsed state of a conversation card's content.
-  document.querySelectorAll(".conversation-content").forEach(function (el) {
-    el.addEventListener("click", function () {
-      el.classList.toggle("is-expanded");
-    });
-  });
-</script>

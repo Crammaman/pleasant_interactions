@@ -1,31 +1,23 @@
 import { Controller } from "@hotwired/stimulus"
+import { Turbo } from "@hotwired/turbo-rails"
 import Sortable from "sortablejs"
 
 // Drag-and-drop ordering for a queue's conversation cards, backed by SortableJS.
-//
-// A card is dragged by its whole header. `delayOnTouchOnly` keeps that from
-// eating vertical scrolling on touch devices: a swipe over the header still
-// pans the page, and only a short press-and-hold starts a drag. A mouse drag
-// stays immediate.
-//
-// The in-progress conversation is pinned to the top: its header is not a handle
-// and it is marked is-locked, which `filter` uses to refuse dragging it, while
-// `onMove` refuses dropping anything above it. Both are needed — `filter` alone
-// would still let other cards slide past it.
-//
-// `preventOnFilter` has to be off: SortableJS tests `filter` before `handle`,
-// so with it on, every mousedown inside the in-progress card would be
-// preventDefault-ed and its expand toggle and Finish button would stop working.
-//
-// Order is saved by PATCHing the ids in their new top-to-bottom order. The DOM
-// is already correct when that request goes out, so a failure is reconciled by
-// reloading rather than by animating cards back.
 export default class extends Controller {
   static targets = ["list"]
   static values = { url: String }
 
   connect() {
     this.savedIds = this.conversationIds
+    this.dragging = false
+    this.missedRefresh = false
+    this.blockMorphWhileDragging = (event) => {
+      if (!this.dragging) return
+
+      event.preventDefault()
+      this.missedRefresh = true
+    }
+    this.listElement.addEventListener("turbo:before-morph-element", this.blockMorphWhileDragging)
     this.sortable = Sortable.create(this.listElement, {
       handle: "[data-queue-sort-handle]",
       filter: ".is-locked",
@@ -38,11 +30,16 @@ export default class extends Controller {
       ghostClass: "is-drag-ghost",
       chosenClass: "is-dragging",
       onMove: (event) => !event.related?.classList.contains("is-locked"),
-      onEnd: () => this.save()
+      onStart: () => { this.dragging = true },
+      onEnd: () => {
+        this.dragging = false
+        this.save()
+      }
     })
   }
 
   disconnect() {
+    this.listElement.removeEventListener("turbo:before-morph-element", this.blockMorphWhileDragging)
     this.sortable?.destroy()
     this.sortable = null
     this.savedIds = null
@@ -51,10 +48,10 @@ export default class extends Controller {
   async save() {
     const ids = this.conversationIds
 
-    if (this.sameOrder(ids)) return
+    if (this.sameOrder(ids)) return this.catchUp()
 
     try {
-      const response = await fetch(this.urlValue, {
+      const response = await Turbo.fetch(this.urlValue, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -67,12 +64,19 @@ export default class extends Controller {
       if (!response.ok) throw new Error(`Reorder failed with ${response.status}`)
 
       this.savedIds = ids
+      this.catchUp()
     } catch (error) {
-      // The cards are sitting in an order the server did not accept, so pull
-      // the authoritative order back rather than leave the two disagreeing.
       console.error(error)
       window.location.reload()
     }
+  }
+
+  // Applies whatever was broadcast while the drag blocked morphing.
+  catchUp() {
+    if (!this.missedRefresh) return
+
+    this.missedRefresh = false
+    Turbo.visit(window.location.href, { action: "replace" })
   }
 
   get conversationIds() {
