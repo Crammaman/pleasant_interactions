@@ -5,7 +5,7 @@
     <div class="box">
       <h1 class="title">Add User</h1>
 
-      <%= form_with url: users_path, method: :post, id: "user-form" do |f| %>
+      <%= form_with url: users_path, method: :post do |f| %>
         <%= fields_for :user, @user do |uf| %>
           <div class="field">
             <label class="label">Username</label>
@@ -36,40 +36,7 @@
           </div>
         <% end %>
 
-        <div class="field">
-          <div class="control">
-            <label class="checkbox">
-              <%= check_box_tag :converser, "1", false, id: "converser-checkbox" %>
-              Converser
-            </label>
-          </div>
-        </div>
-
-        <div id="profile-section" class="box is-hidden">
-          <h2 class="subtitle">Profile</h2>
-
-          <div class="field">
-            <label class="label">Copy questions from</label>
-            <div class="control">
-              <div class="select">
-                <select id="copy-from">
-                  <option value="">(Start blank)</option>
-                  <% @profiles.each do |profile| %>
-                    <option value="<%= profile.id %>"><%= profile.display_name %></option>
-                  <% end %>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div id="questions-list"></div>
-
-          <div class="field">
-            <div class="control">
-              <button type="button" class="button is-link is-light" id="add-question">Add question</button>
-            </div>
-          </div>
-        </div>
+        <%= render "users/questions", converser: true, copy_from: @profiles, questions: @questions || [] %>
 
         <div class="field">
           <div class="control">
@@ -80,141 +47,3 @@
     </div>
   </div>
 </div>
-
-<%# Embedded question data for the client-side "copy from" builder. %>
-<% profiles_json = @profiles.each_with_object({}) do |profile, memo|
-     memo[profile.id] = profile.questions.map do |q|
-       { text: q.text, question_type: q.question_type, options: q.options }
-     end
-   end %>
-<script type="application/json" id="profiles-data">
-  <%= raw profiles_json.to_json %>
-</script>
-
-<template id="question-template">
-  <div class="box question-row">
-    <div class="field">
-      <label class="label is-small">Question text</label>
-      <div class="control">
-        <input type="text" class="input q-text" name="questions[][text]">
-      </div>
-    </div>
-    <div class="field">
-      <label class="label is-small">Type</label>
-      <div class="control">
-        <div class="select">
-          <select class="q-type" name="questions[][question_type]">
-            <option value="text">text</option>
-            <option value="select">select</option>
-            <option value="radio">radio</option>
-          </select>
-        </div>
-      </div>
-    </div>
-    <div class="field q-options-field">
-      <label class="label is-small">Options (one per line or comma-separated)</label>
-      <div class="control">
-        <textarea class="textarea q-options" name="questions[][options]" rows="2"></textarea>
-      </div>
-    </div>
-    <div class="buttons are-small">
-      <button type="button" class="button q-up">&uarr;</button>
-      <button type="button" class="button q-down">&darr;</button>
-      <button type="button" class="button is-danger is-light q-remove">Remove</button>
-    </div>
-  </div>
-</template>
-
-<script>
-  (function () {
-    var checkbox = document.getElementById("converser-checkbox");
-    var section = document.getElementById("profile-section");
-    var list = document.getElementById("questions-list");
-    var template = document.getElementById("question-template");
-    var addBtn = document.getElementById("add-question");
-    var copyFrom = document.getElementById("copy-from");
-    var form = document.getElementById("user-form");
-
-    var profilesData = {};
-    try {
-      profilesData = JSON.parse(document.getElementById("profiles-data").textContent);
-    } catch (e) {
-      profilesData = {};
-    }
-
-    function toggleOptions(row) {
-      var type = row.querySelector(".q-type").value;
-      var optionsField = row.querySelector(".q-options-field");
-      var textarea = row.querySelector(".q-options");
-      if (type === "select" || type === "radio") {
-        optionsField.classList.remove("is-hidden");
-        textarea.disabled = false;
-      } else {
-        optionsField.classList.add("is-hidden");
-        textarea.disabled = true;
-      }
-    }
-
-    function addRow(data) {
-      var frag = template.content.cloneNode(true);
-      var row = frag.querySelector(".question-row");
-
-      if (data) {
-        row.querySelector(".q-text").value = data.text || "";
-        row.querySelector(".q-type").value = data.question_type || "text";
-        row.querySelector(".q-options").value = (data.options || []).join("\n");
-      }
-
-      row.querySelector(".q-type").addEventListener("change", function () {
-        toggleOptions(row);
-      });
-      row.querySelector(".q-remove").addEventListener("click", function () {
-        row.remove();
-      });
-      row.querySelector(".q-up").addEventListener("click", function () {
-        var prev = row.previousElementSibling;
-        if (prev) list.insertBefore(row, prev);
-      });
-      row.querySelector(".q-down").addEventListener("click", function () {
-        var next = row.nextElementSibling;
-        if (next) list.insertBefore(next, row);
-      });
-
-      list.appendChild(row);
-      toggleOptions(row);
-    }
-
-    function replaceRows(questions) {
-      list.innerHTML = "";
-      (questions || []).forEach(function (q) { addRow(q); });
-    }
-
-    checkbox.addEventListener("change", function () {
-      if (checkbox.checked) {
-        section.classList.remove("is-hidden");
-      } else {
-        section.classList.add("is-hidden");
-      }
-    });
-
-    addBtn.addEventListener("click", function () { addRow(null); });
-
-    copyFrom.addEventListener("change", function () {
-      var id = copyFrom.value;
-      if (id && profilesData[id]) {
-        replaceRows(profilesData[id]);
-      } else {
-        replaceRows([]);
-      }
-    });
-
-    // When converser is off, don't submit any question inputs.
-    form.addEventListener("submit", function () {
-      if (!checkbox.checked) {
-        list.querySelectorAll("input, select, textarea").forEach(function (el) {
-          el.disabled = true;
-        });
-      }
-    });
-  })();
-</script>

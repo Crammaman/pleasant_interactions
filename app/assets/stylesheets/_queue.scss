@@ -1,5 +1,5 @@
-/* Conversation card content is collapsed by default and expands on click. */
-.conversation-content {
+/* Interaction card content is collapsed by default and expands on click. */
+.interaction-content {
   position: relative;
   max-height: 4.5rem;
   min-height: 3rem;
@@ -8,13 +8,13 @@
   transition: max-height 0.2s ease;
 }
 
-.conversation-content.is-expanded {
+.interaction-content.is-expanded {
   max-height: none;
 }
 
 /* Fade the bottom edge while collapsed to hint at hidden content. The fade
    tracks the card's own background so it works in either colour scheme. */
-.conversation-content:not(.is-expanded)::after {
+.interaction-content:not(.is-expanded)::after {
   content: "";
   position: absolute;
   left: 0;
@@ -23,14 +23,14 @@
   height: 1.5rem;
   background: linear-gradient(
     to bottom,
-    hsla(var(--bulma-scheme-h), var(--bulma-scheme-s), var(--bulma-scheme-main-l), 0),
-    hsla(var(--bulma-scheme-h), var(--bulma-scheme-s), var(--bulma-scheme-main-l), 0.95)
+    hsla(var(--brand-card-h), var(--brand-card-s), var(--brand-card-l), 0),
+    hsla(var(--brand-card-h), var(--brand-card-s), var(--brand-card-l), 0.95)
   );
   pointer-events: none;
 }
 
 /* In-progress cards use has-background-primary-light, so fade to that instead. */
-.has-background-primary-light .conversation-content:not(.is-expanded)::after {
+.has-background-primary-light .interaction-content:not(.is-expanded)::after {
   background: linear-gradient(
     to bottom,
     hsla(var(--bulma-primary-h), var(--bulma-primary-s), var(--brand-progress-tint-l), 0),
@@ -40,24 +40,24 @@
 
 /* The whole header of a movable card is the drag handle. Suppress text
    selection so dragging across the title does not highlight it instead. */
-.conversation-drag-header {
+.interaction-drag-header {
   cursor: grab;
   user-select: none;
 }
 
-.card.is-dragging .conversation-drag-header {
+.card.is-dragging .interaction-drag-header {
   cursor: grabbing;
 }
 
 /* Grip glyph. Purely a cue that the header above it can be dragged; the
    in-progress card has none, which doubles as the hint that it is pinned. */
-.conversation-handle {
+.interaction-handle {
   font-size: 1.1rem;
   line-height: 1;
   color: var(--bulma-text-weak);
 }
 
-.conversation-drag-header:hover .conversation-handle {
+.interaction-drag-header:hover .interaction-handle {
   color: var(--bulma-text-strong);
 }
 
@@ -72,4 +72,27 @@
   opacity: 0.4;
   outline: 2px dashed var(--bulma-primary);
   outline-offset: -2px;
+}
+
+/* Footer actions share the row evenly. Two things get in the way: `button_to`
+   wraps its button in a form, so the form — not the button — is the flex item
+   the footer lays out, and it has none of the share a `card-footer-item` gets;
+   and a plain link item carries horizontal padding that the browser adds on
+   top of a zero flex-basis, making it wider than the forms. Fix both. */
+.interaction-card > .card-footer {
+  > form.button_to {
+    display: flex;
+    flex-basis: 0;
+    flex-grow: 1;
+    flex-shrink: 0;
+
+    &:not(:last-child) {
+      border-inline-end: var(--bulma-card-footer-border-top);
+    }
+  }
+
+  /* The label is centred anyway, so the inset only skewed the widths. */
+  > .card-footer-item {
+    padding-inline: 0;
+  }
 }

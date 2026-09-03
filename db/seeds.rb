@@ -30,12 +30,12 @@ end
   queue = profile.current_queue
 
   2.times do |i|
-    conversation = queue.conversations.create!(name: "Catch-up ##{i + 1}")
+    interaction = queue.interactions.create!(name: "Catch-up ##{i + 1}")
     profile.questions.ordered.each do |question|
-      conversation.answers.create!(question: question, value: question.options.first || "Doing well, thanks!")
+      interaction.answers.create!(question: question, value: question.options.first || "Doing well, thanks!")
     end
   end
 end
 
-puts "Seeded #{User.count} users, #{Profile.count} profiles, #{Conversation.count} conversations."
+puts "Seeded #{User.count} users, #{Profile.count} profiles, #{Interaction.count} interactions."
 puts "Log in with admin / password123 (or alice, bob)."

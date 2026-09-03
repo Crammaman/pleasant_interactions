@@ -1,0 +1,47 @@
+<%# Name plus one control per answer, shared by the new and edit forms.
+    An answer whose question has since been deleted keeps its snapshot label
+    and a plain text box, since there are no options left to offer. %>
+<div class="field">
+  <%= f.label :name, "Name", class: "label" %>
+  <div class="control">
+    <%= f.text_field :name, class: "input", autofocus: true %>
+  </div>
+</div>
+
+<%= f.fields_for :answers do |answer_fields| %>
+  <% answer = answer_fields.object %>
+  <% question = answer.question %>
+  <div class="field">
+    <%# Persisted answers already store these, and re-submitting question_text
+        would overwrite the snapshot with the question's current wording. %>
+    <% if answer.new_record? %>
+      <%= answer_fields.hidden_field :question_id, value: question.id %>
+      <%= answer_fields.hidden_field :question_text, value: question.text %>
+    <% end %>
+    <label class="label"><%= answer.question_text %></label>
+
+    <% case question&.question_type %>
+    <% when "select" %>
+      <div class="control">
+        <div class="select is-fullwidth">
+          <%= answer_fields.select :value,
+                options_for_select(question.options, answer.value),
+                { include_blank: "Choose…" } %>
+        </div>
+      </div>
+    <% when "radio" %>
+      <div class="control">
+        <% question.options.each do |option| %>
+          <label class="radio">
+            <%= answer_fields.radio_button :value, option %>
+            <%= option %>
+          </label>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="control">
+        <%= answer_fields.text_field :value, class: "input" %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

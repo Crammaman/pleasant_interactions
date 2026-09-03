@@ -1,17 +1,17 @@
 catch_up_feeling:
-  conversation: catch_up
+  interaction: catch_up
   question: feeling
   value: Doing well, thanks!
   question_text: How are you feeling today?
 
 catch_up_topic:
-  conversation: catch_up
+  interaction: catch_up
   question: topic
   value: Family
   question_text: Preferred topic
 
 weekly_chat_feeling:
-  conversation: weekly_chat
+  interaction: weekly_chat
   question: feeling
   value: A bit tired
   question_text: How are you feeling today?

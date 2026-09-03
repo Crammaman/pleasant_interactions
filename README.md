@@ -1,8 +1,8 @@
 # Pleasant Interactions
 
-A small Rails app for managing conversation queues. Users can have a Profile
+A small Rails app for managing interaction queues. Users can have a Profile
 with configurable Questions (text, select, or radio); each profile has a
-current Queue of Conversations whose Answers snapshot the question text at
+current Queue of Interactions whose Answers snapshot the question text at
 creation time.
 
 - Rails 8.1 / Ruby 3.4, SQLite database
@@ -18,7 +18,7 @@ bin/rails server
 
 Log in at http://localhost:3000 with `admin` / `password123` (seeds also
 create `alice` and `bob`, same password, each with a profile, questions, and
-a current queue with example conversations).
+a current queue with example interactions).
 
 ## Running with Docker
 
@@ -82,11 +82,11 @@ bin/rails test
 
 - The queue model is `ProfileQueue` (table `queues`) because Ruby reserves the
   `Queue` constant; associations still read `profile.queues`,
-  `conversation.queue`.
+  `interaction.queue`.
 - Question options for select/radio types are stored in the `config` JSON
   column as `{"options" => [...]}`.
-- Conversations soft-delete: state is one of `pending`, `in_progress`,
-  `finished`, `deleted`; only one conversation per queue may be in progress
+- Interactions soft-delete: state is one of `pending`, `in_progress`,
+  `finished`, `deleted`; only one interaction per queue may be in progress
   at a time.
 - Answers keep a `question_text` snapshot so they still render if their
   question is later edited or deleted.

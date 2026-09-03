@@ -1,0 +1,16 @@
+<% content_for :title, "Edit Interaction" %>
+
+<h1 class="title"><%= @interaction.queue.profile.display_name %> — Edit Interaction</h1>
+
+<%= form_with model: @interaction, url: interaction_path(@interaction), method: :patch do |f| %>
+  <%= render "interactions/fields", f: f %>
+
+  <div class="field is-grouped mt-5">
+    <div class="control">
+      <%= f.submit "Save Interaction", class: "button is-primary" %>
+    </div>
+    <div class="control">
+      <%= link_to "Cancel", queue_path(@interaction.queue), class: "button is-light" %>
+    </div>
+  </div>
+<% end %>

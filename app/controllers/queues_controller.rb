@@ -8,11 +8,11 @@ class QueuesController < ApplicationController
   def show
     @queue = ProfileQueue.includes(profile: :user).find(params[:id])
     @profile = @queue.profile
-    @in_progress = @queue.in_progress_conversation
+    @in_progress = @queue.in_progress_interaction
     # Active = pending + in_progress (unfinished, non-deleted), in the manual
-    # drag-and-drop order, with the in-progress conversation pinned to the top.
-    @conversations =
-      @queue.conversations
+    # drag-and-drop order, with the in-progress interaction pinned to the top.
+    @interactions =
+      @queue.interactions
             .active
             .ordered
             .includes(:answers)
@@ -20,15 +20,15 @@ class QueuesController < ApplicationController
             .flatten(1)
   end
 
-  # Persists a drag-and-drop reorder. The client sends every active conversation
+  # Persists a drag-and-drop reorder. The client sends every active interaction
   # id in its new top-to-bottom order; positions are renumbered from zero.
   def reorder
     queue = ProfileQueue.find(params[:id])
-    conversations = queue.conversations.active.where(id: reorder_ids).index_by(&:id)
+    interactions = queue.interactions.active.where(id: reorder_ids).index_by(&:id)
 
-    Conversation.transaction do
+    Interaction.transaction do
       reorder_ids.each_with_index do |id, index|
-        conversations[id]&.update_column(:position, index)
+        interactions[id]&.update_column(:position, index)
       end
     end
 
@@ -42,6 +42,6 @@ class QueuesController < ApplicationController
   # Ids are looked up within this queue, so anything foreign or already
   # finished/deleted is simply ignored.
   def reorder_ids
-    @reorder_ids ||= Array(params[:conversation_ids]).map(&:to_i)
+    @reorder_ids ||= Array(params[:interaction_ids]).map(&:to_i)
   end
 end

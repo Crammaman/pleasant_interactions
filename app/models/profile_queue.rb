@@ -5,15 +5,15 @@ class ProfileQueue < ApplicationRecord
 
   belongs_to :profile
 
-  has_many :conversations, foreign_key: :queue_id, dependent: :destroy, inverse_of: :queue
+  has_many :interactions, foreign_key: :queue_id, dependent: :destroy, inverse_of: :queue
 
   scope :current, -> { where(current: true) }
 
-  def active_conversations
-    conversations.active.ordered
+  def active_interactions
+    interactions.active.ordered
   end
 
-  def in_progress_conversation
-    conversations.in_progress.first
+  def in_progress_interaction
+    interactions.in_progress.first
   end
 end

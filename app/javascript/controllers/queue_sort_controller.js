@@ -2,13 +2,13 @@ import { Controller } from "@hotwired/stimulus"
 import { Turbo } from "@hotwired/turbo-rails"
 import Sortable from "sortablejs"
 
-// Drag-and-drop ordering for a queue's conversation cards, backed by SortableJS.
+// Drag-and-drop ordering for a queue's interaction cards, backed by SortableJS.
 export default class extends Controller {
   static targets = ["list"]
   static values = { url: String }
 
   connect() {
-    this.savedIds = this.conversationIds
+    this.savedIds = this.interactionIds
     this.dragging = false
     this.missedRefresh = false
     this.blockMorphWhileDragging = (event) => {
@@ -22,7 +22,7 @@ export default class extends Controller {
       handle: "[data-queue-sort-handle]",
       filter: ".is-locked",
       preventOnFilter: false,
-      draggable: "[data-conversation-id]",
+      draggable: "[data-interaction-id]",
       delay: 200,
       delayOnTouchOnly: true,
       touchStartThreshold: 5,
@@ -46,7 +46,7 @@ export default class extends Controller {
   }
 
   async save() {
-    const ids = this.conversationIds
+    const ids = this.interactionIds
 
     if (this.sameOrder(ids)) return this.catchUp()
 
@@ -58,7 +58,7 @@ export default class extends Controller {
           "X-CSRF-Token": this.csrfToken,
           Accept: "application/json"
         },
-        body: JSON.stringify({ conversation_ids: ids })
+        body: JSON.stringify({ interaction_ids: ids })
       })
 
       if (!response.ok) throw new Error(`Reorder failed with ${response.status}`)
@@ -79,10 +79,10 @@ export default class extends Controller {
     Turbo.visit(window.location.href, { action: "replace" })
   }
 
-  get conversationIds() {
+  get interactionIds() {
     return Array.from(
-      this.listElement.querySelectorAll("[data-conversation-id]"),
-      (card) => card.dataset.conversationId
+      this.listElement.querySelectorAll("[data-interaction-id]"),
+      (card) => card.dataset.interactionId
     )
   }
 

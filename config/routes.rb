@@ -5,7 +5,7 @@ Rails.application.routes.draw do
   post   "login",  to: "sessions#create"
   delete "logout", to: "sessions#destroy"
 
-  resources :users, only: %i[new create]
+  resources :users, only: %i[new create edit update]
 
   resources :profiles, only: [] do
     # Jumps to the profile's current queue (creating one if needed).
@@ -13,13 +13,13 @@ Rails.application.routes.draw do
   end
 
   resources :queues, only: %i[show] do
-    # Persists a drag-and-drop reorder of the queue's conversations.
+    # Persists a drag-and-drop reorder of the queue's interactions.
     patch :reorder, on: :member
 
-    resources :conversations, only: %i[new create]
+    resources :interactions, only: %i[new create]
   end
 
-  resources :conversations, only: [] do
+  resources :interactions, only: %i[edit update] do
     member do
       patch :start
       patch :finish

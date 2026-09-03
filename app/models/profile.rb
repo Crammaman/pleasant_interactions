@@ -3,7 +3,7 @@ class Profile < ApplicationRecord
 
   has_many :questions, -> { order(:position) }, dependent: :destroy, inverse_of: :profile
   has_many :queues, class_name: "ProfileQueue", dependent: :destroy, inverse_of: :profile
-  has_many :conversations, through: :queues
+  has_many :interactions, through: :queues
 
   # A profile is generally listed by its user's name.
   def display_name

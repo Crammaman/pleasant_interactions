@@ -1,0 +1,52 @@
+<% in_progress = interaction.in_progress? %>
+<%# is-locked keeps the in-progress interaction pinned to the top of the queue %>
+<div class="card interaction-card mb-4 <%= "has-background-primary-light is-locked" if in_progress %>"
+     id="<%= dom_id(interaction) %>"
+     data-interaction-id="<%= interaction.id %>"
+     data-controller="interaction-expand">
+  <header class="card-header <%= in_progress ? "has-background-primary" : "interaction-drag-header" %>"
+          <%= tag.attributes(data: { queue_sort_handle: true }, title: "Drag to reorder") unless in_progress %>>
+    <% unless in_progress %>
+      <span class="card-header-icon interaction-handle" aria-hidden="true">⠿</span>
+    <% end %>
+    <p class="card-header-title <%= "has-text-white" if in_progress %>">
+      <%= interaction.name %>
+    </p>
+    <% if in_progress %>
+      <span class="card-header-icon">
+        <span class="tag is-primary is-light">In progress</span>
+      </span>
+    <% end %>
+  </header>
+
+  <div class="card-content interaction-content"
+       data-interaction-expand-target="content"
+       data-action="click->interaction-expand#toggle">
+    <% if interaction.answers.any? %>
+      <% interaction.answers.each do |answer| %>
+        <div class="mb-3">
+          <p class="has-text-weight-semibold is-size-7"><%= answer.question_text %></p>
+          <p><%= answer.value.presence || content_tag(:span, "—", class: "has-text-grey-light") %></p>
+        </div>
+      <% end %>
+    <% else %>
+      <p class="has-text-grey">No answers recorded.</p>
+    <% end %>
+  </div>
+
+  <footer class="card-footer">
+    <% if in_progress %>
+      <%= button_to "Finish", finish_interaction_path(interaction), method: :patch,
+                    class: "card-footer-item button is-ghost has-text-weight-semibold" %>
+      <%= link_to "Edit", edit_interaction_path(interaction), class: "card-footer-item" %>
+    <% else %>
+      <%= button_to "Start", start_interaction_path(interaction), method: :patch,
+                    class: "card-footer-item button is-ghost has-text-weight-semibold",
+                    disabled: queue_in_progress %>
+      <%= link_to "Edit", edit_interaction_path(interaction), class: "card-footer-item" %>
+      <%= button_to "Delete", remove_interaction_path(interaction), method: :patch,
+                    class: "card-footer-item button is-ghost has-text-danger",
+                    form: { onsubmit: "return confirm('Delete this interaction?');" } %>
+    <% end %>
+  </footer>
+</div>

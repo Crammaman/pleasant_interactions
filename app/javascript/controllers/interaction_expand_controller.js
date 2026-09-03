@@ -1,6 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Expand/collapse a conversation card's answers, persists it's state across any update broadcasts.
+// Expand/collapse an interaction card's answers, persists it's state across any update broadcasts.
 const openIds = new Set()
 
 export default class extends Controller {
@@ -17,21 +17,21 @@ export default class extends Controller {
   }
 
   toggle() {
-    if (openIds.has(this.conversationId)) {
-      openIds.delete(this.conversationId)
+    if (openIds.has(this.interactionId)) {
+      openIds.delete(this.interactionId)
     } else {
-      openIds.add(this.conversationId)
+      openIds.add(this.interactionId)
     }
 
     this.apply()
   }
 
   apply() {
-    this.contentTarget.classList.toggle("is-expanded", openIds.has(this.conversationId))
+    this.contentTarget.classList.toggle("is-expanded", openIds.has(this.interactionId))
   }
 
   // The card already carries its id for drag-and-drop; no need to repeat it.
-  get conversationId() {
-    return this.element.dataset.conversationId
+  get interactionId() {
+    return this.element.dataset.interactionId
   }
 }

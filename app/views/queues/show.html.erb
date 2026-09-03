@@ -1,7 +1,7 @@
 <% content_for :title, "#{@profile.display_name} — Queue" %>
 
 <%# Live updates: anything that changes this queue broadcasts a page refresh
-    (see Conversation#broadcasts_refreshes_to and QueuesController#reorder), and
+    (see Interaction#broadcasts_refreshes_to and QueuesController#reorder), and
     morphing applies it in place, so open cards, scroll position and an active
     drag survive someone else's change. %>
 <% turbo_refreshes_with method: :morph, scroll: :preserve %>
@@ -20,20 +20,20 @@
   </div>
   <div class="level-right">
     <div class="level-item">
-      <%= link_to "Add Conversation", new_queue_conversation_path(@queue), class: "button is-primary" %>
+      <%= link_to "Add Interaction", new_queue_interaction_path(@queue), class: "button is-primary" %>
     </div>
   </div>
 </div>
 
-<% if @conversations.any? %>
-  <div id="queue-conversations"
+<% if @interactions.any? %>
+  <div id="queue-interactions"
        data-controller="queue-sort" data-queue-sort-url-value="<%= reorder_queue_path(@queue) %>">
-    <%= render partial: "queues/conversation", collection: @conversations, as: :conversation,
+    <%= render partial: "queues/interaction", collection: @interactions, as: :interaction,
                locals: { queue_in_progress: @in_progress.present? } %>
   </div>
 <% else %>
   <div class="notification is-info is-light">
-    <p>No conversations in this queue yet.</p>
-    <%= link_to "Add a conversation", new_queue_conversation_path(@queue), class: "button is-primary mt-3" %>
+    <p>No interactions in this queue yet.</p>
+    <%= link_to "Add an interaction", new_queue_interaction_path(@queue), class: "button is-primary mt-3" %>
   </div>
 <% end %>

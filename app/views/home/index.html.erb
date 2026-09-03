@@ -1,21 +1,33 @@
 <% content_for :title, "Profiles" %>
 
-<h1 class="title">Profiles</h1>
+<div class="level">
+  <div class="level-left">
+    <div class="level-item">
+      <h1 class="title">Profiles</h1>
+    </div>
+  </div>
+  <div class="level-right">
+    <div class="level-item">
+      <%= link_to "Add User", new_user_path, class: "button is-primary" %>
+    </div>
+  </div>
+</div>
 
 <% if @profiles.any? %>
   <div class="columns is-multiline">
     <% @profiles.each do |profile| %>
-      <% count = @conversation_counts[profile.id] || 0 %>
+      <% count = @interaction_counts[profile.id] || 0 %>
       <div class="column is-one-third">
         <div class="card">
           <header class="card-header">
             <p class="card-header-title"><%= profile.display_name %></p>
           </header>
           <div class="card-content">
-            <p><%= pluralize(count, "conversation") %></p>
+            <p><%= pluralize(count, "interaction") %></p>
           </div>
           <footer class="card-footer">
             <%= link_to "Current Queue", queue_profile_path(profile), class: "card-footer-item" %>
+            <%= link_to "Edit User", edit_user_path(profile.user), class: "card-footer-item" %>
           </footer>
         </div>
       </div>
@@ -23,7 +35,6 @@
   </div>
 <% else %>
   <div class="notification is-info is-light">
-    <p>No profiles yet.</p>
-    <%= link_to "Add a user", new_user_path, class: "button is-primary mt-3" %>
+    <p>No profiles yet. Add a user to get started.</p>
   </div>
 <% end %>

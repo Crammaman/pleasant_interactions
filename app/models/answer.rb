@@ -1,5 +1,5 @@
 class Answer < ApplicationRecord
-  belongs_to :conversation, inverse_of: :answers
+  belongs_to :interaction, inverse_of: :answers
   # Optional so answers survive their question being deleted; question_text is
   # the snapshot of the question's text from when the answer was created.
   belongs_to :question, optional: true

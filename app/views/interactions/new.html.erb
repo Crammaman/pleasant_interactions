@@ -1,0 +1,16 @@
+<% content_for :title, "New Interaction" %>
+
+<h1 class="title"><%= @queue.profile.display_name %> — New Interaction</h1>
+
+<%= form_with model: [ @queue, @interaction ], url: queue_interactions_path(@queue), method: :post do |f| %>
+  <%= render "interactions/fields", f: f %>
+
+  <div class="field is-grouped mt-5">
+    <div class="control">
+      <%= f.submit "Add Interaction", class: "button is-primary" %>
+    </div>
+    <div class="control">
+      <%= link_to "Cancel", queue_path(@queue), class: "button is-light" %>
+    </div>
+  </div>
+<% end %>

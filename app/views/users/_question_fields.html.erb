@@ -1,0 +1,36 @@
+<%# One question row. The hidden id comes first so Rack groups each row's
+    questions[][…] params together; a blank id means "create this one". %>
+<div class="box question-row" data-question-row>
+  <%= hidden_field_tag "questions[][id]", question&.id, id: nil %>
+
+  <div class="field">
+    <label class="label is-small">Question text</label>
+    <div class="control">
+      <%= text_field_tag "questions[][text]", question&.text, class: "input", id: nil, data: { question_text: true } %>
+    </div>
+  </div>
+
+  <div class="field">
+    <label class="label is-small">Type</label>
+    <div class="control">
+      <div class="select">
+        <%= select_tag "questions[][question_type]",
+              options_for_select(Question::QUESTION_TYPES, question&.question_type),
+              id: nil, data: { question_type: true, action: "questions#refresh" } %>
+      </div>
+    </div>
+  </div>
+
+  <div class="field" data-question-options>
+    <label class="label is-small">Options (one per line or comma-separated)</label>
+    <div class="control">
+      <%= text_area_tag "questions[][options]", question&.options&.join("\n"), class: "textarea", rows: 3, id: nil %>
+    </div>
+  </div>
+
+  <div class="buttons are-small">
+    <button type="button" class="button" data-action="questions#moveUp">&uarr;</button>
+    <button type="button" class="button" data-action="questions#moveDown">&darr;</button>
+    <button type="button" class="button is-danger is-light" data-action="questions#remove">Remove</button>
+  </div>
+</div>
